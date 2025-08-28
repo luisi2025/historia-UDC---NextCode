@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universidad de Cartagena - Línea de Tiempo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --udc-blue: #1e3a8a;
+            --udc-light-blue: #3b82f6;
+            --udc-gold: #f59e0b;
+            --udc-dark: #1f2937;
+            --udc-gray: #6b7280;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            background: linear-gradient(135deg, var(--udc-blue) 0%, var(--udc-light-blue) 100%);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .slide-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            height: calc(100vh - 100px);
+            width: calc(100vw - 80px);
+            max-width: none;
+            overflow: hidden;
+            margin: auto;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .title-font {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+        
+        .subtitle-font {
+            font-family: 'Open Sans', sans-serif;
+            font-style: italic;
+            font-weight: 400;
+        }
+        
+        .body-font {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+            text-align: justify;
+            line-height: 1.6;
+        }
+        
+        .nav-button {
+            transition: all 0.3s ease;
+            background: var(--udc-gold);
+            color: white;
+        }
+        
+        .nav-button:hover {
+            transform: scale(1.05);
+            background: #d97706;
+        }
+        
+        .progress-dot {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .progress-dot.active {
+            background: var(--udc-gold);
+            transform: scale(1.2);
+        }
+        
+        .icon-container {
+            background: linear-gradient(135deg, var(--udc-gold) 0%, #d97706 100%);
+            border-radius: 50%;
+            padding: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .slide-overlay {
+            background: linear-gradient(135deg, 
+                rgba(30, 58, 138, 0.9) 0%, 
+                rgba(59, 130, 246, 0.8) 50%, 
+                rgba(245, 158, 11, 0.1) 100%);
+        }
+        
+        .text-block {
+            max-width: 100%;
+            margin: 0 auto;
+            overflow-y: auto;
+            height: 100%;
+            padding-right: 5px;
+        }
+        
+        .text-block::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .text-block::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .text-block::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.5);
+            border-radius: 10px;
+        }
+        
+        .text-block::-webkit-scrollbar-thumb:hover {
+            background: rgba(245, 158, 11, 0.8);
+        }
+        
+        .highlight-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--udc-gold);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+        }
+        
+        .fixed-image-container {
+            width: 350px;
+            height: 250px;
+            overflow: hidden;
+            border-radius: 1rem;
+            background-color: #f0f0f0;
+            flex-shrink: 0;
+        }
+        
+        .fixed-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .fixed-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            height: 100%;
+            width: 100%;
+        }
+        
+        .fixed-text-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .fixed-image-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .info-box {
+            width: 100%;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .campus-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+            overflow-y: auto;
+            max-height: 280px;
+            padding-right: 5px;
+        }
+        
+        .campus-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .campus-grid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .campus-grid::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.5);
+            border-radius: 10px;
+        }
+        
+        .campus-grid::-webkit-scrollbar-thumb:hover {
+            background: rgba(245, 158, 11, 0.8);
+        }
+        
+        .campus-item {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .campus-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .campus-name {
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .academic-program {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 0.75rem;
+            padding: 0.6rem;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .program-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--udc-blue);
+            flex: 1;
+        }
+        
+        .program-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--udc-gold);
+            text-align: center;
+            min-width: 60px;
+        }
+        
+        .program-description {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 0.2rem;
+            flex: 1;
+        }
+        
+        .life-project {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .life-project-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 0.75rem;
+            padding: 0.8rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .life-project-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--udc-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .life-project-content {
+            font-size: 0.85rem;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .reflection-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+            gap: 0.5rem;
+        }
+        
+        .reflection-age {
+            font-weight: 600;
+            color: var(--udc-gold);
+            min-width: 80px;
+        }
+        
+        .reflection-text {
+            flex: 1;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .fixed-content-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+            }
+            
+            .fixed-image-container {
+                width: 300px;
+                height: 220px;
+            }
+            
+            .campus-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .academic-program {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .program-count {
+                margin: 0.5rem 0;
+            }
+            
+            .life-project {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 overflow-hidden">
+     <!-- Slide 0: Introducción -->
+    <div class="slide active">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">📚</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">Universidad de Cartagena</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Casi Dos Siglos de Excelencia Académica</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            Desde su fundación en <strong class="text-blue-700">1827</strong>, la Universidad de Cartagena se ha consolidado como una institución emblemática en la región Caribe y en Colombia, comprometida con la formación de profesionales, la producción de conocimiento y el desarrollo social.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                A lo largo de <strong>casi dos siglos</strong>, ha atravesado momentos históricos claves, transformaciones académicas y ampliación de su oferta educativa, construyendo un legado de excelencia y autonomía universitaria.
+                            </p>
+                        </div>
+                        
+                        <p class="body-font text-lg text-gray-700">
+                            Ahora vamos a recorrer los hitos más relevantes que han marcado su trayectoria y su papel fundamental en la educación superior nacional.
+                        </p>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-blue-100 text-blue-800">1827 - 2025</span>
+                        <span class="tag bg-blue-100 text-blue-800">197 Años</span>
+                        <span class="tag bg-blue-100 text-blue-800">Región Caribe</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                 <!-- Espacio para la imagen -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/logo.png" alt="logo" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-blue-600 to-blue-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Universidad de Cartagena</h3>
+                        <p class="text-lg opacity-90">Institución Emblemática</p>
+                        <p class="text-base opacity-80 mt-2">Región Caribe Colombiano</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 1: 1827 - Fundación -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">⚓</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">1827 - Fundación</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Universidad del Magdalena e Istmo</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            La Universidad del Magdalena e Istmo fue creada el 6 de octubre de 1827 mediante decreto de Simón Bolívar. Su sede se estableció en Cartagena bajo la rectoría del canónigo José Joaquín Gómez, marcando el inicio de la educación superior organizada en la región Caribe colombiana.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Programas iniciales:</strong> La universidad comenzó con tres facultades fundamentales: Filosofía y Letras, Medicina y Jurisprudencia, respondiendo a las necesidades educativas de la Gran Colombia en formación.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-blue-100 text-blue-800">Decreto Bolivariano</span>
+                        <span class="tag bg-blue-100 text-blue-800">Educación Superior</span>
+                        <span class="tag bg-blue-100 text-blue-800">Región Caribe</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/decreto.jpg" alt="decreto" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-blue-600 to-blue-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Decreto Fundacional</h3>
+                        <p class="text-lg opacity-90">6 de octubre de 1827</p>
+                        <p class="text-base opacity-80 mt-2">Por Simón Bolívar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 2: 1852 - Rafael Núñez -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🎓</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">1852 - Rafael Núñez Rector</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Reformas Trascendentales</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            En medio de una profunda crisis académica, Rafael Núñez asumió la rectoría e implementó reformas fundamentales. Defendió la expedición de títulos universitarios como requisito esencial para el ejercicio profesional, fortaleciendo especialmente los programas de Filosofía y Letras.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Legado educativo:</strong> Sus reformas establecieron las bases del sistema universitario moderno, enfatizando la importancia de la titulación académica y la calidad educativa en la formación profesional.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-green-100 text-green-800">Reformas Académicas</span>
+                        <span class="tag bg-green-100 text-green-800">Títulos Universitarios</span>
+                        <span class="tag bg-green-100 text-green-800">Calidad Educativa</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/rafa.jpg" alt="rafa" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-green-600 to-green-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Rafael Núñez</h3>
+                        <p class="text-lg opacity-90">Rector Reformador</p>
+                        <p class="text-base opacity-80 mt-2">Futuro Presidente</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 3: 1893-1905 - Nuevas Escuelas -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🏥</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">1893-1905 - Nuevas Escuelas</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Diversificación en Ciencias de la Salud</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            Durante este período se establecieron programas fundamentales como la Escuela de Odontología, la Escuela de Medicina Tropical y la Escuela de Enfermería. Aunque algunas cerraron por limitaciones presupuestales, estas iniciativas sentaron las bases sólidas de la formación en salud en la región.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Impacto regional:</strong> Estas escuelas respondieron a las necesidades específicas del Caribe colombiano, especialmente en medicina tropical y atención sanitaria, estableciendo un precedente de compromiso social universitario.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-red-100 text-red-800">Odontología</span>
+                        <span class="tag bg-red-100 text-red-800">Medicina Tropical</span>
+                        <span class="tag bg-red-100 text-red-800">Enfermería</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/UDC.png" alt="udc" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-red-600 to-red-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Ciencias de la Salud</h3>
+                        <p class="text-lg opacity-90">Diversificación</p>
+                        <p class="text-base opacity-80 mt-2">Bases Regionales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 4: 1925 - Inclusión Femenina -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">👩‍🎓</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">1925 - Inclusión Femenina</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Pionera en Equidad de Género</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            La Universidad de Cartagena se convirtió en pionera nacional al permitir el ingreso de mujeres a la educación superior. La ciudadana rusa Paulina Beregoff fue la primera mujer en matricularse, abriendo definitivamente el camino hacia la inclusión de género en la academia colombiana.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Hito histórico:</strong> Este acontecimiento representó un avance significativo en los derechos educativos, estableciendo un precedente que influenciaría otras instituciones universitarias del país hacia la equidad de género.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-purple-100 text-purple-800">Pionera Nacional</span>
+                        <span class="tag bg-purple-100 text-purple-800">Paulina Beregoff</span>
+                        <span class="tag bg-purple-100 text-purple-800">Equidad de Género</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/paul.png" alt="paulina" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-purple-600 to-purple-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Inclusión Histórica</h3>
+                        <p class="text-lg opacity-90">Primera Mujer</p>
+                        <p class="text-base opacity-80 mt-2">Paulina Beregoff</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 5: 1940-1950 - Facultades Profesionales -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🎓</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">1940-1950 - Facultades Profesionales</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Transformación Institucional</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            La Universidad experimentó una transformación profunda con la creación de nuevas facultades como Medicina, Farmacia y la consolidación definitiva de Odontología. La Ley 68 de 1935 proporcionó el marco legal necesario para estas reformas estructurales que respondían a las crecientes necesidades regionales.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Fortalecimiento institucional:</strong> Este período marcó la consolidación de la universidad como centro de formación profesional integral, estableciendo las bases para su reconocimiento nacional en educación superior.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-indigo-100 text-indigo-800">Medicina</span>
+                        <span class="tag bg-indigo-100 text-indigo-800">Farmacia</span>
+                        <span class="tag bg-indigo-100 text-indigo-800">Ley 68 de 1935</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/facmed.png" alt="facultad" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-indigo-600 to-indigo-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Consolidación</h3>
+                        <p class="text-lg opacity-90">Facultades Profesionales</p>
+                        <p class="text-base opacity-80 mt-2">Marco Legal Sólido</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 6: 1949-1958 - Ingeniería y Economía -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">⚙️</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">1949-1958 - Ingeniería y Economía</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Respuesta al Crecimiento Urbano</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            La creación de la Facultad de Ingeniería Civil y posteriormente la Facultad de Economía y Administración representó la respuesta institucional a los cambios sociales y el acelerado crecimiento urbano de Cartagena. También se estableció el Departamento de Humanidades, completando la oferta académica integral.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Visión de desarrollo:</strong> Estos programas reflejaron la comprensión universitaria sobre la necesidad de formar profesionales capacitados para liderar el desarrollo económico y la modernización de la región Caribe.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-yellow-100 text-yellow-800">Ingeniería Civil</span>
+                        <span class="tag bg-yellow-100 text-yellow-800">Economía</span>
+                        <span class="tag bg-yellow-100 text-yellow-800">Humanidades</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/cart.png" alt="cartagena" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-yellow-600 to-yellow-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Modernización</h3>
+                        <p class="text-lg opacity-90">Desarrollo Urbano</p>
+                        <p class="text-base opacity-80 mt-2">Cambios Sociales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 7: 1974-1975 - Trabajo Social -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🤝</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">1974-1975 - Trabajo Social</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Compromiso con la Transformación Social</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            Se fundó la Escuela de Trabajo Social, posteriormente elevada a Facultad de Ciencias Sociales y Educación. Esta iniciativa representó el compromiso institucional con la transformación social y la atención profesional a los problemas comunitarios del Caribe colombiano.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Responsabilidad social:</strong> La creación de estos programas reflejó la conciencia universitaria sobre su papel en el desarrollo social, formando profesionales comprometidos con el bienestar comunitario y la justicia social.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-teal-100 text-teal-800">Trabajo Social</span>
+                        <span class="tag bg-teal-100 text-teal-800">Ciencias Sociales</span>
+                        <span class="tag bg-teal-100 text-teal-800">Compromiso Social</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/trab.png" alt="trabajo" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-teal-600 to-teal-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Transformación</h3>
+                        <p class="text-lg opacity-90">Compromiso Social</p>
+                        <p class="text-base opacity-80 mt-2">Servicio Comunitario</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 8: 1970s - Ciudadela de la Salud -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🏥</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">Década 1970 - Ciudadela de la Salud</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Campus de Zaragocilla</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            La construcción del campus de Zaragocilla reunió las facultades de Medicina, Odontología, Química y Farmacia, y Enfermería en un moderno complejo académico. Esta expansión física representó una apuesta decidida por la modernización académica y el desarrollo científico en ciencias de la salud.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Modernización académica:</strong> El nuevo campus integró laboratorios especializados, clínicas de práctica y espacios de investigación, estableciendo estándares de calidad que posicionaron a la universidad como referente regional en formación sanitaria.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-pink-100 text-pink-800">Campus Zaragocilla</span>
+                        <span class="tag bg-pink-100 text-pink-800">Investigación</span>
+                        <span class="tag bg-pink-100 text-pink-800">Práctica Clínica</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/sede.png" alt="sedes" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-pink-600 to-pink-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Expansión</h3>
+                        <p class="text-lg opacity-90">Modernización</p>
+                        <p class="text-base opacity-80 mt-2">Desarrollo Científico</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 9: 1990 - Educación a Distancia -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">💻</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">1990 - Educación a Distancia</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Sistema SEAD</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            Con el apoyo financiero del Banco Interamericano de Desarrollo (BID), la Universidad creó el Sistema de Educación Abierta y a Distancia (SEAD). Este modelo innovador permitió llevar la educación superior a diferentes municipios del Caribe, democratizando efectivamente el acceso a la formación universitaria.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Democratización educativa:</strong> El SEAD representó una revolución en el acceso a la educación superior, eliminando barreras geográficas y económicas, y estableciendo un modelo replicado posteriormente por otras instituciones nacionales.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-cyan-100 text-cyan-800">SEAD</span>
+                        <span class="tag bg-cyan-100 text-cyan-800">Democratización</span>
+                        <span class="tag bg-cyan-100 text-cyan-800">Apoyo BID</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/sead.png" alt="Sistema SEAD" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-cyan-600 to-cyan-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Innovación</h3>
+                        <p class="text-lg opacity-90">Educación a Distancia</p>
+                        <p class="text-base opacity-80 mt-2">Acceso Regional</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 10: 2000s - Expansión y Nuevos Retos -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🚀</span>
+                        </div>
+                        <h1 class="title-font text-3xl text-gray-800 mb-4">2000s en adelante - Expansión</h1>
+                        <h2 class="subtitle-font text-2xl text-gray-600 mb-6">Institución de Referencia Regional</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-lg text-gray-700 mb-4">
+                            En el siglo XXI la Universidad de Cartagena se consolidó como institución de referencia en el Caribe colombiano. Abrió nuevas sedes como Piedra de Bolívar y La Merced, además de centros regionales en Magangué, Lorica y otros municipios estratégicos del territorio nacional.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-lg text-gray-700">
+                                <strong>Excelencia académica:</strong> La oferta se amplió con más de 40 programas de posgrado, incluyendo maestrías y doctorados, con un fuerte compromiso hacia la investigación científica y la acreditación de alta calidad institucional.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-blue-100 text-blue-800">Nuevas Sedes</span>
+                        <span class="tag bg-blue-100 text-blue-800">40+ Posgrados</span>
+                        <span class="tag bg-blue-100 text-blue-800">Alta Calidad</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 400px; height: 300px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/prin.jpg" alt="expancion" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-blue-600 to-blue-800 text-white text-center">
+                        <h3 class="text-2xl font-bold mb-2">Consolidación</h3>
+                        <p class="text-lg opacity-90">Referente Regional</p>
+                        <p class="text-base opacity-80 mt-2">Siglo XXI</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 11: Plataforma Estratégica -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🎯</span>
+                        </div>
+                        <h1 class="title-font text-2xl text-gray-800 mb-3">Plataforma Estratégica</h1>
+                        <h2 class="subtitle-font text-xl text-gray-600 mb-4">Visión y Misión Institucional</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-base text-gray-700 mb-3">
+                            La Universidad de Cartagena ha definido una plataforma estratégica que orienta su desarrollo institucional hacia la excelencia académica, la investigación innovadora y la proyección social.
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-base text-gray-700">
+                                <strong>Misión:</strong> Formar profesionales integrales, críticos y éticos, generar conocimiento relevante y contribuir al desarrollo social, económico y cultural de la región Caribe y el país.
+                            </p>
+                        </div>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-base text-gray-700">
+                                <strong>Visión 2030:</strong> Ser una universidad líder en Colombia, reconocida por su excelencia académica, su impacto en la solución de problemas regionales y su contribución al desarrollo sostenible.
+                            </p>
+                        </div>
+                        
+                        <p class="body-font text-base text-gray-700">
+                            Esta plataforma se fundamenta en principios de autonomía, calidad, pertinencia y responsabilidad social, que guían todas las acciones institucionales.
+                        </p>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-blue-100 text-blue-800">Excelencia</span>
+                        <span class="tag bg-blue-100 text-blue-800">Innovación</span>
+                        <span class="tag bg-blue-100 text-blue-800">Responsabilidad Social</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 350px; height: 250px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/plat.png" alt="Plataforma Estratégica" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-blue-600 to-blue-800 text-white text-center">
+                        <h3 class="text-xl font-bold mb-1">Plataforma Estratégica</h3>
+                        <p class="text-base opacity-90">Orientación Institucional</p>
+                        <p class="text-sm opacity-80 mt-1">Visión 2030</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 12: Oferta Académica - Facultades -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🏛️</span>
+                        </div>
+                        <h1 class="title-font text-2xl text-gray-800 mb-3">Oferta Académica</h1>
+                        <h2 class="subtitle-font text-xl text-gray-600 mb-4">Facultades y Departamentos</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-base text-gray-700 mb-3">
+                            La Universidad de Cartagena cuenta con una estructura académica organizada en 9 facultades que ofrecen formación integral en diversas áreas del conocimiento:
+                        </p>
+                        
+                        <div class="highlight-box">
+                            <p class="body-font text-base text-gray-700">
+                                <strong>Facultades:</strong> Ciencias de la Salud, Ciencias Exactas y Naturales, Ciencias Económicas, Ciencias Sociales y Educación, Derecho y Ciencias Políticas, Humanidades, Ingeniería, Odontología, y Comunicación y Periodismo.
+                            </p>
+                        </div>
+                        
+                        <p class="body-font text-base text-gray-700 mb-3">
+                            Cada facultad está conformada por departamentos especializados que garantizan la profundización disciplinar y el desarrollo de investigaciones en áreas específicas del conocimiento.
+                        </p>
+                        
+                        <p class="body-font text-base text-gray-700">
+                            Esta estructura permite una oferta académica diversificada que responde a las necesidades del entorno regional y nacional, con programas de pregrado, posgrado y educación continua.
+                        </p>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-green-100 text-green-800">9 Facultades</span>
+                        <span class="tag bg-green-100 text-green-800">30+ Departamentos</span>
+                        <span class="tag bg-green-100 text-green-800">Formación Integral</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 350px; height: 250px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/facu.png" alt="Facultades" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-green-600 to-green-800 text-white text-center">
+                        <h3 class="text-xl font-bold mb-1">Estructura Académica</h3>
+                        <p class="text-base opacity-90">9 Facultades</p>
+                        <p class="text-sm opacity-80 mt-1">Conocimiento Diversificado</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 13: Oferta Académica - Programas -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">📚</span>
+                        </div>
+                        <h1 class="title-font text-2xl text-gray-800 mb-3">Oferta Académica</h1>
+                        <h2 class="subtitle-font text-xl text-gray-600 mb-4">Programas de Formación</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-base text-gray-700 mb-3">
+                            La Universidad de Cartagena ofrece una amplia variedad de programas académicos en diferentes niveles de formación:
+                        </p>
+                        
+                        <div class="academic-program">
+                            <div class="program-title">Cursos Propedéuticos</div>
+                            <div class="program-count">15+</div>
+                            <div class="program-description">Programas de nivelación y preparación para la educación superior</div>
+                        </div>
+                        
+                        <div class="academic-program">
+                            <div class="program-title">Programas de Pregrado</div>
+                            <div class="program-count">45+</div>
+                            <div class="program-description">Programas profesionales en diversas áreas del conocimiento</div>
+                        </div>
+                        
+                        <div class="academic-program">
+                            <div class="program-title">Programas de Posgrado</div>
+                            <div class="program-count">50+</div>
+                            <div class="program-description">Especializaciones, maestrías y doctorados</div>
+                        </div>
+                        
+                        <div class="academic-program">
+                            <div class="program-title">Maestrías</div>
+                            <div class="program-count">25+</div>
+                            <div class="program-description">Programas de profundización disciplinar</div>
+                        </div>
+                        
+                        <div class="academic-program">
+                            <div class="program-title">Doctorados</div>
+                            <div class="program-count">8+</div>
+                            <div class="program-description">Programas de formación avanzada e investigación</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-purple-100 text-purple-800">Formación Integral</span>
+                        <span class="tag bg-purple-100 text-purple-800">Calidad Académica</span>
+                        <span class="tag bg-purple-100 text-purple-800">Acreditados</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 350px; height: 250px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/aca.png" alt="Programas Académicos" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-purple-600 to-purple-800 text-white text-center">
+                        <h3 class="text-xl font-bold mb-1">Oferta Educativa</h3>
+                        <p class="text-base opacity-90">140+ Programas</p>
+                        <p class="text-sm opacity-80 mt-1">Todos los Niveles</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 14: Campus de Atención -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🏫</span>
+                        </div>
+                        <h1 class="title-font text-2xl text-gray-800 mb-3">Campus de Atención</h1>
+                        <h2 class="subtitle-font text-xl text-gray-600 mb-4">Presencia Regional</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-base text-gray-700 mb-3">
+                            La Universidad de Cartagena cuenta con múltiples sedes y campus que permiten una amplia cobertura en la región Caribe:
+                        </p>
+                        
+                        <div class="campus-grid">
+                            <div class="campus-item">
+                                <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/agus.png" alt="San Agustín" class="campus-image">
+                                <div class="campus-name">Campus San Agustín</div>
+                            </div>
+                            <div class="campus-item">
+                                <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/sarag.png" alt="Zaragocilla" class="campus-image">
+                                <div class="campus-name">Campus Zaragocilla</div>
+                            </div>
+                            <div class="campus-item">
+                                <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/pied.png" alt="Piedra de Bolívar" class="campus-image">
+                                <div class="campus-name">Sede Piedra de Bolívar</div>
+                            </div>
+                            <div class="campus-item">
+                                <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/merc.png" alt="La Merced" class="campus-image">
+                                <div class="campus-name">Sede La Merced</div>
+                            </div>
+                            <div class="campus-item">
+                                <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/momp.png" alt="Mompós" class="campus-image">
+                                <div class="campus-name">Centro Regional Mompós</div>
+                            </div>
+                            <div class="campus-item">
+                                <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/mag.png" alt="Magangué" class="campus-image">
+                                <div class="campus-name">Centro Regional Magangué</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-yellow-100 text-yellow-800">6 Sedes</span>
+                        <span class="tag bg-yellow-100 text-yellow-800">Cobertura Regional</span>
+                        <span class="tag bg-yellow-100 text-yellow-800">Presencia Nacional</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 350px; height: 250px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/mapa.png" alt="Mapa de Sedes" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-yellow-600 to-yellow-800 text-white text-center">
+                        <h3 class="text-xl font-bold mb-1">Presencia Regional</h3>
+                        <p class="text-base opacity-90">6 Sedes Principales</p>
+                        <p class="text-sm opacity-80 mt-1">Cobertura en el Caribe</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 15: Conclusión -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container" style="padding: 1rem; margin-bottom: 0.5rem;">
+                            <span class="text-3xl">🏆</span>
+                        </div>
+                        <h1 class="title-font text-xl text-gray-800 mb-2">Conclusión</h1>
+                        <h2 class="subtitle-font text-lg text-gray-600 mb-2">Legado y Futuro de la Universidad de Cartagena</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-sm text-gray-700 mb-2">
+                            A lo largo de sus casi dos siglos de existencia, la Universidad de Cartagena ha demostrado una capacidad excepcional para adaptarse a los cambios históricos y sociales, manteniendo siempre su compromiso con la excelencia académica y el desarrollo regional.
+                        </p>
+                        
+                        <div class="highlight-box" style="padding: 0.6rem; margin: 0.6rem 0;">
+                            <p class="body-font text-sm text-gray-700">
+                                <strong>Legado histórico:</strong> Desde su fundación bolivariana hasta su consolidación como institución de referencia, la Universidad ha sido testigo y protagonista de los momentos más importantes de la historia de Colombia y la región Caribe.
+                            </p>
+                        </div>
+                        
+                        <p class="body-font text-sm text-gray-700 mb-2">
+                            Hoy, la Universidad de Cartagena continúa su camino hacia la excelencia, con una oferta académica diversificada, programas de investigación de alto impacto y una proyección internacional que la posiciona como una de las instituciones de educación superior más importantes del país.
+                        </p>
+                        
+                        <div class="highlight-box" style="padding: 0.6rem; margin: 0.6rem 0;">
+                            <p class="body-font text-sm text-gray-700">
+                                <strong>Compromiso futuro:</strong> La Universidad mantiene su compromiso con la formación de profesionales íntegros, la producción de conocimiento relevante y la contribución al desarrollo social y económico de Colombia y el Caribe.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container" style="margin-top: 0.5rem;">
+                        <span class="tag bg-blue-100 text-blue-800">Excelencia Académica</span>
+                        <span class="tag bg-blue-100 text-blue-800">Investigación</span>
+                        <span class="tag bg-blue-100 text-blue-800">Desarrollo Regional</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div class="fixed-image-container" style="width: 300px; height: 220px;">
+                        <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/bien.jpg" alt="Universidad de Cartagena" class="fixed-image">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-blue-600 to-blue-800 text-white text-center" style="padding: 0.8rem;">
+                        <h3 class="text-lg font-bold mb-1">Universidad de Cartagena</h3>
+                        <p class="text-sm opacity-90">Legado y Futuro</p>
+                        <p class="text-xs opacity-80 mt-1">Compromiso con la Excelencia</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 16: Proyecto de Vida - Luisi Castro -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🎯</span>
+                        </div>
+                        <h1 class="title-font text-2xl text-gray-800 mb-3">Proyecto de Vida</h1>
+                        <h2 class="subtitle-font text-xl text-gray-600 mb-4">Luisi Castro Saucedo - Ingeniería de Software</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-base text-gray-700 mb-3">
+                            Con la elaboración de este proyecto de vida pretendo organizar y orientar mis acciones, la toma de decisiones y los pasos para alcanzar mis metas académicas, profesionales y personales, y desarrollar competencias que me ayuden generar aportes positivos en mi entorno.
+                        </p>
+                        
+                        <div class="life-project">
+                            <div class="life-project-section">
+                                <div class="life-project-title">
+                                    <span>⏱️</span> Corto plazo (0-6 meses)
+                                </div>
+                                <div class="life-project-content">
+                                    • Organizar mi rutina de estudio para mejorar el rendimiento académico<br>
+                                    • Fortalecer mis habilidades de trabajo en equipo por medio del trabajo colaborativo
+                                </div>
+                            </div>
+                            
+                            <div class="life-project-section">
+                                <div class="life-project-title">
+                                    <span>📅</span> Mediano plazo (6-3 años)
+                                </div>
+                                <div class="life-project-content">
+                                    • Desarrollar potencial intelectual participando activamente en clase<br>
+                                    • Participar en semilleros de investigación para desarrollar destrezas<br>
+                                    • Consolidar habilidades en un lenguaje de programación para desarrollar proyectos tecnológicos
+                                </div>
+                            </div>
+                            
+                            <div class="life-project-section">
+                                <div class="life-project-title">
+                                    <span>🚀</span> Largo plazo (3+ años)
+                                </div>
+                                <div class="life-project-content">
+                                    • Finalizar mi pregrado<br>
+                                    • Realizar una especialización en el área de tecnología<br>
+                                    • Desarrollar mi propia empresa de tecnología<br>
+                                    • Disfrutar tiempo de calidad con mi familia
+                                </div>
+                            </div>
+                            
+                            <div class="life-project-section">
+                                <div class="life-project-title">
+                                    <span>💡</span> Conclusión
+                                </div>
+                                <div class="life-project-content">
+                                    Este proyecto de vida me compromete a establecer disciplina que fortalezca mi aprendizaje con mucha constancia. Establece pasos para alcanzar una meta con el fin de convertirme en un profesional capaz de transformar mi entorno, sin dejar de lado mi familia como soporte fundamental que me impulsa seguir adelante.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="highlight-box" style="margin-top: 1rem;">
+                            <div class="life-project-title">
+                                <span>🤔</span> Reflexión personal
+                            </div>
+                            <div class="life-project-content">
+                                Las experiencias que hemos tenido en nuestra vida, en las etapas que ya han pasado, influyen en lo que hoy estamos viviendo.
+                            </div>
+                            <div style="margin-top: 0.5rem;">
+                                <div class="reflection-item">
+                                    <div class="reflection-age">7 a 12 años:</div>
+                                    <div class="reflection-text">Me enseñaron amor por el estudio, responsabilidad</div>
+                                </div>
+                                <div class="reflection-item">
+                                    <div class="reflection-age">12 a 16 años:</div>
+                                    <div class="reflection-text">Aprendí a autodefenderme, valores, sentido de pertenencia, desarrollé disciplina y trabajo en equipo en el colegio</div>
+                                </div>
+                                <div class="reflection-item">
+                                    <div class="reflection-age">17 años hasta hoy:</div>
+                                    <div class="reflection-text">He aprendido de los errores, a reflexionar sobre los eventos positivos y negativos que he tenido durante esta etapa que a su vez ha forjado una mentalidad más persistente para conseguir cosas, ahora en la universidad estoy aprendiendo trabajo autónomo, trabajo en equipo, visión mucho más clara y específica del futuro.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-indigo-100 text-indigo-800">Proyecto de Vida</span>
+                        <span class="tag bg-indigo-100 text-indigo-800">Metas</span>
+                        <span class="tag bg-indigo-100 text-indigo-800">Crecimiento Personal</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 350px; height: 250px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/" alt="Proyecto de Vida" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-indigo-600 to-indigo-800 text-white text-center">
+                        <h3 class="text-xl font-bold mb-1">Proyecto de Vida</h3>
+                        <p class="text-base opacity-90">Luisi Castro Saucedo</p>
+                        <p class="text-sm opacity-80 mt-1">Ingeniería de Software</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 17: Plan de Metas - Antonio Merlano -->
+    <div class="slide">
+        <div class="slide-overlay absolute inset-0"></div>
+        <div class="slide-content">
+            <div class="fixed-content-grid">
+                <!-- Contenido Principal -->
+                <div class="fixed-text-section">
+                    <div class="text-center lg:text-left">
+                        <div class="icon-container">
+                            <span class="text-4xl">🎯</span>
+                        </div>
+                        <h1 class="title-font text-2xl text-gray-800 mb-3">Plan de Metas Académicas y Personales</h1>
+                        <h2 class="subtitle-font text-xl text-gray-600 mb-4">Antonio Merlano Ruidiaz - Ingeniería de Software</h2>
+                    </div>
+                    
+                    <div class="text-block">
+                        <p class="body-font text-base text-gray-700 mb-3">
+                            Soy Antonio Merlano Ruidiaz, tengo 24 años y curso el primer semestre de Ingeniería de Software. En esta etapa es importante establecer metas claras para guiar mi desarrollo académico, personal y profesional.
+                        </p>
+                        
+                        <div class="life-project">
+                            <div class="life-project-section">
+                                <div class="life-project-title">
+                                    <span>⏱️</span> Corto plazo (0-6 meses)
+                                </div>
+                                <div class="life-project-content">
+                                    • Adaptarme al ritmo académico y comprender los conceptos básicos de Ingeniería de Software<br>
+                                    • Colaborar eficazmente en trabajos grupales con mis compañeros de CIPA<br>
+                                    • Construir hábitos de estudio y organización del tiempo
+                                </div>
+                            </div>
+                            
+                            <div class="life-project-section">
+                                <div class="life-project-title">
+                                    <span>📅</span> Mediano plazo (6 meses a 3 años)
+                                </div>
+                                <div class="life-project-content">
+                                    • Profundizar en las materias y participar en proyectos académicos<br>
+                                    • Desarrollar habilidades individuales y de trabajo en equipo<br>
+                                    • Consolidar amistades y relaciones profesionales que apoyen mi crecimiento
+                                </div>
+                            </div>
+                            
+                            <div class="life-project-section">
+                                <div class="life-project-title">
+                                    <span>🚀</span> Largo plazo (más de 3 años)
+                                </div>
+                                <div class="life-project-content">
+                                    • Completar mi pregrado y prepararme para el campo laboral<br>
+                                    • Trabajar en proyectos desafiantes que contribuyan a mi aprendizaje<br>
+                                    • Construir una carrera significativa aplicando lo aprendido
+                                </div>
+                            </div>
+                            
+                            <div class="life-project-section">
+                                <div class="life-project-title">
+                                    <span>💡</span> Conclusión
+                                </div>
+                                <div class="life-project-content">
+                                    Tener metas claras permite mantener el enfoque y la motivación en mi vida académica y personal. Cada objetivo representa un paso hacia mi formación profesional y mi crecimiento integral.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="highlight-box" style="margin-top: 1rem;">
+                            <div class="life-project-title">
+                                <span>🤔</span> Reflexión personal
+                            </div>
+                            <div class="life-project-content">
+                                Entiendo que alcanzar mis metas requiere disciplina y constancia. La universidad no solo enseña conocimientos técnicos, sino también habilidades humanas como liderazgo y resiliencia. Estoy decidido a aprovechar cada oportunidad para fortalecer mi carácter y mi futuro profesional.
+                            </div>
+                            <div style="margin-top: 0.5rem;">
+                                <div class="reflection-item">
+                                    <div class="reflection-age">7 a 12 años:</div>
+                                    <div class="reflection-text">Durante estos años comencé a entender la importancia de esforzarme y aprender de mis errores. Descubrí que la disciplina y la orientación de quienes saben más me ayudan a avanzar. Mi curiosidad me impulsaba a conocer más sobre el mundo y a hacer preguntas para comprender mejor lo que me rodea.</div>
+                                </div>
+                                <div class="reflection-item">
+                                    <div class="reflection-age">12 a 16 años:</div>
+                                    <div class="reflection-text">Esta etapa me enseñó sobre la importancia de las relaciones y las decisiones. Aprendí que algunas amistades permanecen, mientras que otras no, y que cada decisión tiene consecuencias. Esto me ayudó a desarrollar independencia, a pensar con claridad y a valorar aquello que realmente aporta a mi crecimiento.</div>
+                                </div>
+                                <div class="reflection-item">
+                                    <div class="reflection-age">17 años hasta hoy:</div>
+                                    <div class="reflection-text">En esta etapa asumí mayores responsabilidades y comprendí que mis decisiones tienen un impacto directo en mi vida. Aprendí a enfrentar errores, a ser constante y a mantener el control sobre mí mismo para alcanzar mis metas. La universidad me ha enseñado que estudiar no solo es adquirir conocimientos, sino también formarme como persona, fortaleciendo mi capacidad de perseverar y de aprender de cada experiencia.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tag-container">
+                        <span class="tag bg-teal-100 text-teal-800">Plan de Metas</span>
+                        <span class="tag bg-teal-100 text-teal-800">Desarrollo Académico</span>
+                        <span class="tag bg-teal-100 text-teal-800">Crecimiento Personal</span>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="fixed-image-section">
+                    <div style="width: 350px; height: 250px; margin: 0 auto; border-radius: 16px; overflow: hidden; background-color: #f0f0f0;">
+                            <img src="/Desktop/ing-softw Mompos/Magalais florez/Catedra Institucional/imgenes/" alt="Plan de Metas" style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block;">
+                    </div>
+                    <div class="info-box bg-gradient-to-br from-teal-600 to-teal-800 text-white text-center">
+                        <h3 class="text-xl font-bold mb-1">Plan de Metas</h3>
+                        <p class="text-base opacity-90">Antonio Merlano Ruidiaz</p>
+                        <p class="text-sm opacity-80 mt-1">Ingeniería de Software</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 z-50">
+        <!-- Previous Button -->
+        <button id="prevBtn" class="nav-button p-3 rounded-full shadow-lg transition-all duration-300">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+        <!-- Progress Indicators -->
+        <div class="flex space-x-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-3 py-1">
+            <div class="progress-dot active w-3 h-3 rounded-full cursor-pointer" data-slide="0"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="1"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="2"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="3"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="4"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="5"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="6"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="7"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="8"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="9"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="10"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="11"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="12"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="13"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="14"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="15"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="16"></div>
+            <div class="progress-dot w-3 h-3 rounded-full cursor-pointer" data-slide="17"></div>
+        </div>
+        <!-- Next Button -->
+        <button id="nextBtn" class="nav-button p-3 rounded-full shadow-lg transition-all duration-300">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+    </div>
+    
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressDots = document.querySelectorAll('.progress-dot');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        function updateSlideNumbers() {
+            const footers = document.querySelectorAll('.footer-logo:last-child');
+            footers.forEach((footer, index) => {
+                footer.textContent = `${index + 1} / ${totalSlides}`;
+            });
+        }
+        
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            progressDots[currentSlide].classList.remove('active');
+            
+            currentSlide = (n + totalSlides) % totalSlides;
+            
+            slides[currentSlide].classList.add('active');
+            progressDots[currentSlide].classList.add('active');
+        }
+        
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+        
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+        
+        // Event listeners
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+        
+        // Progress dot navigation
+        progressDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+            });
+        });
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                showSlide(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                showSlide(totalSlides - 1);
+            }
+        });
+        
+        // Initialize
+        updateSlideNumbers();
+        
+        // Optional: Auto-advance (uncomment to enable)
+        // setInterval(nextSlide, 15000); // Auto-advance every 15 seconds
+    </script>
+</body>
+</html>
